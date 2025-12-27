@@ -1,41 +1,56 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
+import { createTask, fetchTaskDetail, updateTask } from '../../api/modules/adminTasks'
+import type { TaskStatus } from '../../api/types'
 
-const props = defineProps<{ id?: string; mode?: 'create' | 'edit' }>()
+const props = defineProps<{ taskNo?: string; mode?: 'create' | 'edit' }>()
 const router = useRouter()
 const formRef = ref<FormInstance>()
 
 const form = reactive({
   title: '',
   description: '',
-  pointReward: 50,
+  pointReward: 0,
   deadline: '',
-  status: 'OPEN',
+  status: 'OPEN' as TaskStatus,
 })
 
-const isEdit = computed(() => !!props.id || props.mode === 'edit')
+const isEdit = computed(() => !!props.taskNo || props.mode === 'edit')
 
 const rules: FormRules = {
   title: [{ required: true, message: '请输入任务标题', trigger: 'blur' }],
   pointReward: [{ required: true, message: '请输入积分奖励', trigger: 'blur' }],
 }
 
+async function loadDetail() {
+  if (!props.taskNo) return
+  const detail = await fetchTaskDetail(props.taskNo)
+  form.title = detail.title
+  form.description = detail.description ?? ''
+  form.pointReward = detail.pointReward
+  form.deadline = detail.deadline ?? ''
+  form.status = detail.status
+}
+
 onMounted(() => {
   if (isEdit.value) {
-    // 预填充示例数据，实际可改为调用接口
-    form.title = '每日签到截图'
-    form.description = '上传今日签到截图用于审核'
-    form.pointReward = 50
-    form.deadline = '2025-01-01'
-    form.status = 'OPEN'
+    loadDetail()
   }
 })
 
-const onSubmit = () => {
-  formRef.value?.validate((valid) => {
+function onSubmit() {
+  formRef.value?.validate(async (valid) => {
     if (!valid) return
+    if (isEdit.value && props.taskNo) {
+      await updateTask(props.taskNo, form)
+      ElMessage.success('已保存')
+    } else {
+      await createTask(form)
+      ElMessage.success('创建成功')
+    }
     router.push('/admin/tasks')
   })
 }
@@ -75,13 +90,13 @@ const onSubmit = () => {
             v-model="form.description"
             type="textarea"
             rows="4"
-            placeholder="补充任务要求、示例"
+            placeholder="填写任务要求、示例"
             maxlength="500"
             show-word-limit
           />
         </el-form-item>
         <el-form-item label="状态">
-          <el-segmented v-model="form.status" :options="['OPEN', 'CLOSED']" />
+          <el-segmented v-model="form.status" :options="['OPEN', 'CLOSED', 'ENDED']" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">{{

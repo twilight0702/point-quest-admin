@@ -1,11 +1,10 @@
 import { request } from '../http'
-import type { Paginated, Task } from '../types'
+import type { PageTask, Task, TaskStatus } from '../types'
 
 export interface TaskQuery {
-  status?: string
-  keyword?: string
-  page?: number
-  pageSize?: number
+  page: number
+  size: number
+  status?: TaskStatus | ''
 }
 
 export interface TaskPayload {
@@ -13,43 +12,43 @@ export interface TaskPayload {
   description?: string
   pointReward: number
   deadline?: string
-  status?: 'OPEN' | 'CLOSED'
+  status?: TaskStatus
 }
 
-export function fetchTasks(params?: TaskQuery) {
-  return request<Paginated<Task>>({
+export function fetchTasks(params: TaskQuery) {
+  return request<PageTask>({
     url: '/api/admin/tasks',
     method: 'GET',
     params,
   })
 }
 
-export function fetchTaskDetail(id: number) {
+export function fetchTaskDetail(taskNo: string) {
   return request<Task>({
-    url: `/api/admin/tasks/${id}`,
+    url: `/api/admin/tasks/${taskNo}`,
     method: 'GET',
   })
 }
 
 export function createTask(payload: TaskPayload) {
-  return request<Task>({
+  return request<void>({
     url: '/api/admin/tasks',
     method: 'POST',
     data: payload,
   })
 }
 
-export function updateTask(id: number, payload: TaskPayload) {
+export function updateTask(taskNo: string, payload: TaskPayload) {
   return request<Task>({
-    url: `/api/admin/tasks/${id}`,
+    url: `/api/admin/tasks/${taskNo}`,
     method: 'PUT',
     data: payload,
   })
 }
 
-export function closeTask(id: number) {
+export function deleteTask(taskNo: string) {
   return request<void>({
-    url: `/api/admin/tasks/${id}/close`,
-    method: 'POST',
+    url: `/api/admin/tasks/${taskNo}`,
+    method: 'DELETE',
   })
 }

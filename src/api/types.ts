@@ -17,14 +17,34 @@ export interface AdminProfile {
   role: 'ADMIN'
 }
 
+export type TaskStatus = 'OPEN' | 'CLOSED' | 'ENDED'
+
 export interface Task {
   id: number
+  taskNo: string
   title: string
   description?: string
   pointReward: number
   deadline?: string
-  status: 'OPEN' | 'CLOSED'
+  status: TaskStatus
+  createdBy?: number
+  createdUserType?: string
   createdAt?: string
+  updatedAt?: string
+  isDel?: number
+}
+
+export interface PageTask {
+  records: Task[]
+  total: number
+  size: number
+  current: number
+  orders?: Array<{ column: string; asc: boolean }>
+  optimizeCountSql?: boolean
+  searchCount?: boolean
+  optimizeJoinOfCountSql?: boolean
+  maxLimit?: number
+  countId?: string
 }
 
 export interface TaskSubmission {

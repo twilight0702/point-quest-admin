@@ -31,7 +31,7 @@ const router = createRouter({
         { path: '', name: 'AdminDashboard', component: Dashboard },
         { path: 'tasks', name: 'AdminTasks', component: AdminTasks },
         { path: 'tasks/new', name: 'AdminTaskNew', component: TaskForm, props: { mode: 'create' } },
-        { path: 'tasks/:id/edit', name: 'AdminTaskEdit', component: TaskForm, props: true },
+        { path: 'tasks/:taskNo/edit', name: 'AdminTaskEdit', component: TaskForm, props: true },
         { path: 'submissions', name: 'AdminSubmissions', component: Submissions },
         {
           path: 'submissions/:id',
