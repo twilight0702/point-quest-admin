@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+﻿import { createRouter, createWebHistory } from 'vue-router'
 import { useAdminAuthStore } from '../stores/adminAuth'
 import AdminLayout from '../layouts/AdminLayout.vue'
 import AdminLogin from '../views/admin/AdminLogin.vue'
@@ -58,15 +58,10 @@ const router = createRouter({
   ],
 })
 
-const BYPASS_AUTH = true // 临时绕过登录，方便查看页面；后续接回 /api/auth/me 校验
-
 router.beforeEach(async (to, from, next) => {
-  if (BYPASS_AUTH) {
-    if (to.path === '/admin/login') return next('/admin')
-    return next()
-  }
-
   const authStore = useAdminAuthStore()
+  await authStore.ensureSession()
+
   if (to.meta.public) {
     if (to.path === '/admin/login' && authStore.isAuthenticated) {
       return next('/admin')
@@ -75,9 +70,10 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (to.path.startsWith('/admin')) {
-    const waitProfile = Promise.race([authStore.ensureProfile(), new Promise((resolve) => setTimeout(resolve, 2500))])
-    await waitProfile
-    if (!authStore.isAuthenticated || authStore.me?.role !== 'ADMIN') {
+    if (!authStore.isAuthenticated) {
+      return next({ path: '/admin/login', query: { redirect: to.fullPath } })
+    }
+    if (authStore.me && authStore.me.role !== 'ADMIN') {
       return next({ path: '/admin/login', query: { redirect: to.fullPath } })
     }
   }

@@ -1,4 +1,4 @@
-import { request } from '../http'
+﻿import { request } from '../http'
 import type { AdminProfile } from '../types'
 
 export interface LoginPayload {
@@ -6,18 +6,16 @@ export interface LoginPayload {
   password: string
 }
 
-export function login(payload: LoginPayload) {
-  return request<AdminProfile>({
-    url: '/api/auth/login',
-    method: 'POST',
-    data: payload,
-  })
+export interface AuthResponse {
+  token: string
+  user?: AdminProfile
 }
 
-export function fetchProfile() {
-  return request<AdminProfile>({
-    url: '/api/auth/me',
-    method: 'GET',
+export function login(payload: LoginPayload) {
+  return request<AuthResponse>({
+    url: '/api/auth/admin/login',
+    method: 'POST',
+    data: payload,
   })
 }
 

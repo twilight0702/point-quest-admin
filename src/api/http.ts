@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios'
+﻿import axios, { AxiosError } from 'axios'
 import type {
   AxiosInstance,
   AxiosRequestConfig,
@@ -7,6 +7,7 @@ import type {
 } from 'axios'
 import { ElMessage } from 'element-plus'
 import type { ApiResponse } from './types'
+import { clearToken, getValidToken } from '../utils/authToken'
 
 export class ApiError extends Error {
   code?: number
@@ -23,12 +24,19 @@ export class ApiError extends Error {
 const SUCCESS_CODES = new Set([0, 200])
 
 const http: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? '',
   timeout: 15000,
   withCredentials: true,
 })
 
 http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const token = getValidToken()
+  if (token) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${token}`,
+    }
+  }
   return config
 })
 
@@ -48,7 +56,6 @@ function normalizeResponse<T>(response: AxiosResponse<ApiResponse<T>>): T {
     throw new ApiError(message, { code: payload.code, status: response.status })
   }
 
-  // Fallback for non-standard responses
   return (response.data as unknown as T) ?? ({} as T)
 }
 
@@ -63,7 +70,11 @@ function handleHttpError(error: AxiosError<ApiResponse<unknown>>): never {
         ? '没有权限执行该操作'
         : status === 422
           ? '请求参数有误'
-          : '网络异常，请稍后再试')
+          : '网络异常，请稍后重试')
+
+  if (status === 401) {
+    clearToken()
+  }
 
   ElMessage.error(message)
   throw new ApiError(message, { code: payload?.code, status })
