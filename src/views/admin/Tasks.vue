@@ -58,6 +58,12 @@ function handlePageChange(page: number) {
   loadTasks()
 }
 
+function handleSizeChange(size: number) {
+  pagination.size = size
+  pagination.page = 1
+  loadTasks()
+}
+
 onMounted(loadTasks)
 </script>
 
@@ -106,9 +112,11 @@ onMounted(loadTasks)
         <el-pagination
           :current-page="pagination.page"
           :page-size="pagination.size"
+          :page-sizes="[10, 20, 50]"
           :total="pagination.total"
-          layout="total, prev, pager, next"
+          layout="total, sizes, prev, pager, next"
           @current-change="handlePageChange"
+          @size-change="handleSizeChange"
         />
       </div>
     </el-card>
