@@ -47,25 +47,55 @@ export interface PageTask {
   countId?: string
 }
 
-export interface TaskSubmission {
-  id: number
-  taskId: number
+export interface AdminSubmission {
+  submissionNo: string
+  taskNo: string
+  taskTitle: string
+  username: string
+  userEmail: string
+  pointReward: number
+  status: string
+  evidenceText?: string
+  createdAt: string
+}
+
+export interface AdminSubmissionDetail extends AdminSubmission {
   userId: number
-  status: 'PENDING' | 'APPROVED' | 'REJECTED'
-  submittedAt?: string
-  evidenceUrl?: string
-  comment?: string
+  evidencePreviewUrls: string[]
+  pointsAwarded?: number
+  reviewComment?: string
+}
+
+export interface PageAdminSubmission {
+  records: AdminSubmission[]
+  total: number
+  size: number
+  current: number
+  orders?: Array<{ column: string; asc: boolean }>
+  optimizeCountSql?: boolean
+  searchCount?: boolean
+  optimizeJoinOfCountSql?: boolean
+  maxLimit?: number
+  countId?: string
 }
 
 export interface Reward {
   id: number
+  rewardNo: string
   name: string
-  code?: string
   description?: string
   pointCost: number
-  category?: string
   status: 'ON' | 'OFF'
   stock?: number
+  categoryIds?: number[]
+  categoryNames?: string[]
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface RewardCategory {
+  id: number
+  name: string
 }
 
 export interface Pool {
@@ -94,4 +124,21 @@ export interface Order {
   totalPoints: number
   createdAt: string
   status: string
+}
+
+export interface PageReward {
+  records: Reward[]
+  total: number
+  size: number
+  current: number
+  orders?: Array<{ column: string; asc: boolean }>
+  optimizeCountSql?: boolean
+  searchCount?: boolean
+  optimizeJoinOfCountSql?: boolean
+  maxLimit?: number
+  countId?: string
+}
+
+export interface RewardCategoryList {
+  categories: RewardCategory[]
 }

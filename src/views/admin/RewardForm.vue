@@ -1,47 +1,160 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  addRewardCategory,
+  createReward,
+  deleteRewardCategory,
+  fetchRewardCategories,
+  fetchRewardDetail,
+  updateReward,
+  updateRewardCategory,
+} from '../../api/modules/adminRewards'
+import type { RewardCategory } from '../../api/types'
 
-const props = defineProps<{ id?: string; mode?: 'create' | 'edit' }>()
+const props = defineProps<{ rewardNo?: string; mode?: 'create' | 'edit' }>()
 const router = useRouter()
 const formRef = ref<FormInstance>()
+const loading = ref(false)
+const submitting = ref(false)
 
 const form = reactive({
   name: '',
-  code: '',
   description: '',
-  pointCost: 200,
-  category: '',
-  stock: 20,
-  status: 'ON',
+  pointCost: 0,
+  stock: 0,
+  status: 'ON' as 'ON' | 'OFF',
+  categoryIds: [] as number[],
 })
 
-const isEdit = computed(() => !!props.id || props.mode === 'edit')
+const categories = ref<RewardCategory[]>([])
+const categoriesLoading = ref(false)
+const categoryDialog = reactive({
+  visible: false,
+  editingId: null as number | null,
+  name: '',
+})
+const categorySaving = ref(false)
+
+const isEdit = computed(() => !!props.rewardNo || props.mode === 'edit')
 
 const rules: FormRules = {
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-  pointCost: [{ required: true, message: '请输入积分价格', trigger: 'blur' }],
+  pointCost: [{ required: true, message: '请输入积分消耗', trigger: 'change' }],
+  stock: [{ type: 'number', min: 0, message: '库存需大于等于0', trigger: 'change' }],
 }
 
-onMounted(() => {
-  if (isEdit.value) {
-    form.name = '50元京东卡'
-    form.code = 'JD50'
-    form.description = '数字兑换码，发货后请妥善保存'
-    form.pointCost = 500
-    form.category = '礼品卡'
-    form.stock = 15
-    form.status = 'ON'
+async function loadCategories() {
+  categoriesLoading.value = true
+  try {
+    const data = await fetchRewardCategories()
+    categories.value = data.categories || []
+  } finally {
+    categoriesLoading.value = false
   }
-})
+}
 
-const onSubmit = () => {
-  formRef.value?.validate((valid) => {
+async function loadDetail() {
+  if (!props.rewardNo) return
+  loading.value = true
+  try {
+    const data = await fetchRewardDetail(props.rewardNo)
+    form.name = data.name
+    form.description = data.description || ''
+    form.pointCost = data.pointCost
+    form.stock = data.stock ?? 0
+    form.status = (data.status as 'ON' | 'OFF') || 'ON'
+    form.categoryIds = data.categoryIds || []
+  } finally {
+    loading.value = false
+  }
+}
+
+function buildPayload() {
+  return {
+    name: form.name,
+    description: form.description || undefined,
+    pointCost: form.pointCost,
+    status: form.status,
+    stock: form.stock ?? 0,
+    categoryIds: form.categoryIds,
+  }
+}
+
+function handleSubmit() {
+  formRef.value?.validate(async (valid) => {
     if (!valid) return
-    router.push('/admin/rewards')
+    submitting.value = true
+    try {
+      if (isEdit.value && props.rewardNo) {
+        await updateReward(props.rewardNo, buildPayload())
+        ElMessage.success('已保存修改')
+      } else {
+        await createReward(buildPayload())
+        ElMessage.success('创建成功')
+      }
+      router.push('/admin/rewards')
+    } finally {
+      submitting.value = false
+    }
   })
 }
+
+function openCategoryDialog(category?: RewardCategory) {
+  categoryDialog.visible = true
+  categoryDialog.editingId = category?.id ?? null
+  categoryDialog.name = category?.name ?? ''
+  loadCategories()
+}
+
+function closeCategoryDialog() {
+  categoryDialog.visible = false
+  categoryDialog.editingId = null
+  categoryDialog.name = ''
+}
+
+async function handleSaveCategory() {
+  const name = categoryDialog.name.trim()
+  if (!name) {
+    ElMessage.warning('请输入分类名称')
+    return
+  }
+  categorySaving.value = true
+  try {
+    if (categoryDialog.editingId) {
+      await updateRewardCategory(categoryDialog.editingId, name)
+      ElMessage.success('已保存分类')
+    } else {
+      await addRewardCategory(name)
+      ElMessage.success('已新增分类')
+    }
+    await loadCategories()
+    closeCategoryDialog()
+  } finally {
+    categorySaving.value = false
+  }
+}
+
+async function handleDeleteCategory(category: RewardCategory) {
+  try {
+    await ElMessageBox.confirm(`确认删除分类「${category.name}」？`, '提示', { type: 'warning' })
+    await deleteRewardCategory(category.id)
+    ElMessage.success('已删除分类')
+    form.categoryIds = form.categoryIds.filter((id) => id !== category.id)
+    await loadCategories()
+  } catch (error) {
+    // 用户取消或请求失败，已提示
+  }
+}
+
+onMounted(async () => {
+  await loadCategories()
+  if (isEdit.value) {
+    await loadDetail()
+  }
+})
 </script>
 
 <template>
@@ -51,8 +164,13 @@ const onSubmit = () => {
       <el-button plain @click="router.back()">返回</el-button>
     </div>
 
-    <el-card shadow="never">
+    <el-card shadow="never" v-loading="loading">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" label-position="left">
+        <template v-if="isEdit && props.rewardNo">
+          <el-form-item label="奖品编号">
+            <el-input :model-value="props.rewardNo" disabled />
+          </el-form-item>
+        </template>
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item label="名称" prop="name">
@@ -60,48 +178,98 @@ const onSubmit = () => {
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="编码">
-              <el-input v-model="form.code" placeholder="可用于搜索" />
+            <el-form-item label="积分消耗" prop="pointCost">
+              <el-input-number v-model="form.pointCost" :min="0" :step="10" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="积分价格" prop="pointCost">
-              <el-input-number v-model="form.pointCost" :min="0" :step="10" />
+            <el-form-item label="初始库存" prop="stock">
+              <el-input-number v-model="form.stock" :min="0" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="初始库存">
-              <el-input-number v-model="form.stock" :min="0" />
+            <el-form-item label="状态">
+              <el-segmented v-model="form.status" :options="['ON', 'OFF']" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-form-item label="分类">
-          <el-select v-model="form.category" placeholder="选择分类" clearable>
-            <el-option label="礼品卡" value="giftcard" />
-            <el-option label="周边" value="merch" />
-            <el-option label="数字权益" value="digital" />
-          </el-select>
+          <div class="category-select-row">
+            <el-select
+              v-model="form.categoryIds"
+              multiple
+              filterable
+              clearable
+              placeholder="选择分类"
+              style="width: 100%"
+              :loading="categoriesLoading"
+            >
+              <el-option v-for="cat in categories" :key="cat.id" :label="cat.name" :value="cat.id" />
+            </el-select>
+            <el-button size="small" @click="openCategoryDialog()">管理分类</el-button>
+          </div>
         </el-form-item>
         <el-form-item label="描述">
           <el-input
             v-model="form.description"
             type="textarea"
             rows="4"
-            placeholder="说明兑换方式、发货时间等"
+            placeholder="说明兑换方式、使用规则等"
+            clearable
           />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-segmented v-model="form.status" :options="['ON', 'OFF']" />
-        </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">{{
-            isEdit ? '保存修改' : '创建奖品'
-          }}</el-button>
+          <el-button type="primary" :loading="submitting" @click="handleSubmit">
+            {{ isEdit ? '保存修改' : '创建奖品' }}
+          </el-button>
           <el-button @click="router.back()">取消</el-button>
         </el-form-item>
       </el-form>
     </el-card>
+
+    <el-dialog v-model="categoryDialog.visible" title="分类管理" width="520px" @close="closeCategoryDialog">
+      <el-form label-width="80px">
+        <el-form-item label="分类名称">
+          <el-input v-model="categoryDialog.name" placeholder="请输入分类名称" />
+        </el-form-item>
+        <div class="dialog-actions">
+          <el-button @click="closeCategoryDialog">取消</el-button>
+          <el-button type="primary" :loading="categorySaving" @click="handleSaveCategory">
+            {{ categoryDialog.editingId ? '保存' : '新增' }}
+          </el-button>
+        </div>
+      </el-form>
+
+      <el-table :data="categories" :loading="categoriesLoading" size="small" border style="margin-top: 12px">
+        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="name" label="分类名称" />
+        <el-table-column label="操作" width="180" align="center">
+          <template #default="scope">
+            <el-button link type="primary" @click="openCategoryDialog(scope.row)">编辑</el-button>
+            <el-popconfirm title="确认删除该分类？" @confirm="handleDeleteCategory(scope.row)">
+              <template #reference>
+                <el-button link type="danger">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
+
+<style scoped>
+.category-select-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+</style>

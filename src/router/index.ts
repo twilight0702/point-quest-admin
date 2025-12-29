@@ -34,7 +34,7 @@ const router = createRouter({
         { path: 'tasks/:taskNo/edit', name: 'AdminTaskEdit', component: TaskForm, props: true },
         { path: 'submissions', name: 'AdminSubmissions', component: Submissions },
         {
-          path: 'submissions/:id',
+          path: 'submissions/:submissionNo',
           name: 'AdminSubmissionDetail',
           component: SubmissionDetail,
           props: true,
@@ -46,7 +46,12 @@ const router = createRouter({
           component: RewardForm,
           props: { mode: 'create' },
         },
-        { path: 'rewards/:id/edit', name: 'AdminRewardEdit', component: RewardForm, props: true },
+        {
+          path: 'rewards/:rewardNo/edit',
+          name: 'AdminRewardEdit',
+          component: RewardForm,
+          props: true,
+        },
         { path: 'pools', name: 'AdminPools', component: Pools },
         { path: 'pools/new', name: 'AdminPoolNew', component: PoolForm, props: { mode: 'create' } },
         { path: 'pools/:id/edit', name: 'AdminPoolEdit', component: PoolForm, props: true },

@@ -1,43 +1,38 @@
 import { request } from '../http'
-import type { Paginated, Reward } from '../types'
+import type { PageReward, Reward, RewardCategoryList } from '../types'
 
 export interface RewardQuery {
   status?: string
   keyword?: string
   page?: number
-  pageSize?: number
+  size?: number
 }
 
-export interface RewardPayload {
+export interface RewardRequest {
   name: string
-  code?: string
   description?: string
   pointCost: number
-  category?: string
   status?: 'ON' | 'OFF'
   stock?: number
-}
-
-export interface StockPayload {
-  delta: number
+  categoryIds?: number[]
 }
 
 export function fetchRewards(params?: RewardQuery) {
-  return request<Paginated<Reward>>({
+  return request<PageReward>({
     url: '/api/admin/rewards',
     method: 'GET',
     params,
   })
 }
 
-export function fetchRewardDetail(id: number) {
+export function fetchRewardDetail(rewardNo: string) {
   return request<Reward>({
-    url: `/api/admin/rewards/${id}`,
+    url: `/api/admin/rewards/${rewardNo}`,
     method: 'GET',
   })
 }
 
-export function createReward(payload: RewardPayload) {
+export function createReward(payload: RewardRequest) {
   return request<Reward>({
     url: '/api/admin/rewards',
     method: 'POST',
@@ -45,25 +40,47 @@ export function createReward(payload: RewardPayload) {
   })
 }
 
-export function updateReward(id: number, payload: RewardPayload) {
+export function updateReward(rewardNo: string, payload: RewardRequest) {
   return request<Reward>({
-    url: `/api/admin/rewards/${id}`,
+    url: `/api/admin/rewards/${rewardNo}`,
     method: 'PUT',
     data: payload,
   })
 }
 
-export function adjustStock(id: number, payload: StockPayload) {
+export function deleteReward(rewardNo: string) {
   return request<void>({
-    url: `/api/admin/rewards/${id}/stock`,
-    method: 'POST',
-    data: payload,
+    url: `/api/admin/rewards/${rewardNo}`,
+    method: 'DELETE',
   })
 }
 
-export function toggleReward(id: number, on: boolean) {
+export function fetchRewardCategories() {
+  return request<RewardCategoryList>({
+    url: '/api/admin/rewards/all-category',
+    method: 'GET',
+  })
+}
+
+export function addRewardCategory(name: string) {
   return request<void>({
-    url: `/api/admin/rewards/${id}/${on ? 'on' : 'off'}`,
+    url: '/api/admin/rewards/category',
     method: 'POST',
+    data: name,
+  })
+}
+
+export function updateRewardCategory(categoryId: number, name: string) {
+  return request<void>({
+    url: `/api/admin/rewards/category/${categoryId}`,
+    method: 'PUT',
+    data: name,
+  })
+}
+
+export function deleteRewardCategory(categoryId: number) {
+  return request<void>({
+    url: `/api/admin/rewards/category/${categoryId}`,
+    method: 'DELETE',
   })
 }

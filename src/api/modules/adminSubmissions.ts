@@ -1,43 +1,47 @@
 import { request } from '../http'
-import type { Paginated, TaskSubmission } from '../types'
+import type { AdminSubmission, AdminSubmissionDetail, PageAdminSubmission } from '../types'
 
 export interface SubmissionQuery {
+  page: number
+  size: number
   status?: string
-  page?: number
-  pageSize?: number
 }
 
-export interface ReviewPayload {
+export interface ApproveSubmissionPayload {
+  pointsAwarded?: number
   comment?: string
-  points?: number
 }
 
-export function fetchSubmissions(params?: SubmissionQuery) {
-  return request<Paginated<TaskSubmission>>({
+export interface RejectSubmissionPayload {
+  comment: string
+}
+
+export function fetchSubmissions(params: SubmissionQuery) {
+  return request<PageAdminSubmission>({
     url: '/api/admin/submissions',
     method: 'GET',
     params,
   })
 }
 
-export function fetchSubmissionDetail(id: number) {
-  return request<TaskSubmission>({
-    url: `/api/admin/submissions/${id}`,
+export function fetchSubmissionDetail(submissionNo: string) {
+  return request<AdminSubmissionDetail>({
+    url: `/api/admin/submissions/${submissionNo}`,
     method: 'GET',
   })
 }
 
-export function approveSubmission(id: number, payload: ReviewPayload) {
+export function approveSubmission(submissionNo: string, payload: ApproveSubmissionPayload) {
   return request<void>({
-    url: `/api/admin/submissions/${id}/approve`,
+    url: `/api/admin/submissions/${submissionNo}/approve`,
     method: 'POST',
     data: payload,
   })
 }
 
-export function rejectSubmission(id: number, payload: ReviewPayload) {
+export function rejectSubmission(submissionNo: string, payload: RejectSubmissionPayload) {
   return request<void>({
-    url: `/api/admin/submissions/${id}/reject`,
+    url: `/api/admin/submissions/${submissionNo}/reject`,
     method: 'POST',
     data: payload,
   })

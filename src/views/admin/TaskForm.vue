@@ -80,8 +80,10 @@ function onSubmit() {
         <el-form-item label="截止时间">
           <el-date-picker
             v-model="form.deadline"
-            type="date"
-            placeholder="选择日期"
+            type="datetime"
+            value-format="YYYY-MM-DDTHH:mm:ss"
+            format="YYYY-MM-DD HH:mm:ss"
+            placeholder="选择截止时间"
             style="width: 100%"
           />
         </el-form-item>
