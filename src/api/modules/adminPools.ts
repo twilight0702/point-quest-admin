@@ -1,29 +1,34 @@
 import { request } from '../http'
-import type { Paginated, Pool, PoolItem, Reward } from '../types'
+import type { PagePool, Pool } from '../types'
+
+export interface PoolItemPayload {
+  rewardId: number
+  sortNo?: number
+  weight: number
+}
 
 export interface PoolPayload {
-  name: string
-  status?: 'ON' | 'OFF'
+  title: string
+  description?: string
+  pointCost: number
   startAt?: string
   endAt?: string
-  rewardIds?: number[]
+  status?: 'ON' | 'OFF'
+  type?: string
+  items?: PoolItemPayload[]
 }
 
-export interface PoolItemsPayload {
-  items: PoolItem[]
-}
-
-export function fetchPools(params?: { status?: string; page?: number; pageSize?: number }) {
-  return request<Paginated<Pool>>({
+export function fetchPools(params: { status?: string; page: number; size: number }) {
+  return request<PagePool>({
     url: '/api/admin/pools',
     method: 'GET',
     params,
   })
 }
 
-export function fetchPoolDetail(id: number) {
-  return request<Pool & { rewards?: Reward[]; items?: PoolItem[] }>({
-    url: `/api/admin/pools/${id}`,
+export function fetchPoolDetail(poolNo: string) {
+  return request<Pool>({
+    url: `/api/admin/pools/${poolNo}`,
     method: 'GET',
   })
 }
@@ -36,18 +41,17 @@ export function createPool(payload: PoolPayload) {
   })
 }
 
-export function updatePool(id: number, payload: PoolPayload) {
+export function updatePool(poolNo: string, payload: PoolPayload) {
   return request<Pool>({
-    url: `/api/admin/pools/${id}`,
+    url: `/api/admin/pools/${poolNo}`,
     method: 'PUT',
     data: payload,
   })
 }
 
-export function updatePoolItems(id: number, payload: PoolItemsPayload) {
+export function deletePool(poolNo: string) {
   return request<void>({
-    url: `/api/admin/pools/${id}/items`,
-    method: 'PUT',
-    data: payload,
+    url: `/api/admin/pools/${poolNo}`,
+    method: 'DELETE',
   })
 }

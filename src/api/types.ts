@@ -100,15 +100,40 @@ export interface RewardCategory {
 
 export interface Pool {
   id: number
-  name: string
-  status: 'ON' | 'OFF'
+  poolNo: string
+  title: string
+  description?: string
+  pointCost: number
   startAt?: string
   endAt?: string
+  status: 'ON' | 'OFF'
+  type?: string
+  createdAt?: string
+  updatedAt?: string
+  items?: PoolItem[]
 }
 
 export interface PoolItem {
   rewardId: number
-  sortNo: number
+  rewardName?: string
+  rewardNo?: string
+  pointCost?: number
+  rewardStatus?: string
+  sortNo?: number
+  weight?: number
+}
+
+export interface PagePool {
+  records: Pool[]
+  total: number
+  size: number
+  current: number
+  orders?: Array<{ column: string; asc: boolean }>
+  optimizeCountSql?: boolean
+  searchCount?: boolean
+  optimizeJoinOfCountSql?: boolean
+  maxLimit?: number
+  countId?: string
 }
 
 export interface MessagePayload {
