@@ -143,12 +143,40 @@ export interface MessagePayload {
   broadcast?: boolean
 }
 
-export interface Order {
+export type OrderStatus = 'CREATED' | 'PROCESSING' | 'SHIPPED' | 'COMPLETED' | 'CANCELLED'
+
+export interface AdminOrderSummary {
   orderNo: string
   userId: number
   totalPoints: number
   createdAt: string
-  status: string
+  status: OrderStatus
+  itemCount: number
+}
+
+export interface OrderItem {
+  rewardId: number
+  rewardName: string
+  pointCost: number
+  quantity: number
+}
+
+export interface AdminOrderDetail extends AdminOrderSummary {
+  address: string
+  items: OrderItem[]
+}
+
+export interface PageAdminOrderSummary {
+  records: AdminOrderSummary[]
+  total: number
+  size: number
+  current: number
+  orders?: Array<{ column: string; asc: boolean }>
+  optimizeCountSql?: boolean
+  searchCount?: boolean
+  optimizeJoinOfCountSql?: boolean
+  maxLimit?: number
+  countId?: string
 }
 
 export interface PageReward {

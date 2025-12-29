@@ -1,14 +1,15 @@
 import { request } from '../http'
-import type { Order, Paginated } from '../types'
+import type { AdminOrderDetail, AdminOrderSummary, OrderStatus, PageAdminOrderSummary } from '../types'
 
 export interface OrderQuery {
   userId?: number
   page?: number
-  pageSize?: number
+  size?: number
+  status?: OrderStatus
 }
 
 export function fetchOrders(params?: OrderQuery) {
-  return request<Paginated<Order>>({
+  return request<PageAdminOrderSummary>({
     url: '/api/admin/orders',
     method: 'GET',
     params,
@@ -16,8 +17,16 @@ export function fetchOrders(params?: OrderQuery) {
 }
 
 export function fetchOrderDetail(orderNo: string) {
-  return request<Order>({
+  return request<AdminOrderDetail>({
     url: `/api/admin/orders/${orderNo}`,
     method: 'GET',
+  })
+}
+
+export function updateOrderStatus(orderNo: string, status: OrderStatus) {
+  return request<AdminOrderDetail>({
+    url: `/api/admin/orders/${orderNo}/status`,
+    method: 'PUT',
+    data: { status },
   })
 }

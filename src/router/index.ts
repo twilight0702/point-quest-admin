@@ -13,6 +13,7 @@ import Pools from '../views/admin/Pools.vue'
 import PoolForm from '../views/admin/PoolForm.vue'
 import MessageSend from '../views/admin/MessageSend.vue'
 import Orders from '../views/admin/Orders.vue'
+import OrderDetail from '../views/admin/OrderDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +58,7 @@ const router = createRouter({
         { path: 'pools/:poolNo/edit', name: 'AdminPoolEdit', component: PoolForm, props: true },
         { path: 'messages/send', name: 'AdminMessageSend', component: MessageSend },
         { path: 'orders', name: 'AdminOrders', component: Orders },
+        { path: 'orders/:orderNo', name: 'AdminOrderDetail', component: OrderDetail, props: true },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/admin' },
