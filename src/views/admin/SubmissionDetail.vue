@@ -1,6 +1,7 @@
 ﻿<script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Document } from '@element-plus/icons-vue'
 import {
   approveSubmission,
   fetchSubmissionDetail,
@@ -25,6 +26,18 @@ const statusLabel: Record<string, string> = {
 }
 
 const canReview = computed(() => submission.value?.status === 'PENDING')
+
+const evidenceItems = computed(() => {
+  const urls = submission.value?.evidencePreviewUrls ?? []
+  return urls.map((url) => {
+    const cleanPath = url.split('#')[0].split('?')[0]
+    const ext = cleanPath.includes('.') ? cleanPath.split('.').pop()?.toLowerCase() ?? '' : ''
+    const isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'svg'].includes(ext)
+    const fullName = decodeURIComponent(cleanPath.split('/').filter(Boolean).pop() ?? cleanPath)
+    const filename = fullName.includes('_') ? fullName.split('_').slice(1).join('_') : fullName
+    return { url, ext, isImage, filename }
+  })
+})
 
 async function loadDetail() {
   loading.value = true
@@ -112,16 +125,23 @@ onMounted(loadDetail)
               </div>
               <div class="section">
                 <strong>佐证材料：</strong>
-                <div v-if="submission.evidencePreviewUrls?.length" class="evidence-list">
-                  <el-image
-                    v-for="url in submission.evidencePreviewUrls"
-                    :key="url"
-                    :src="url"
-                    fit="cover"
-                    class="evidence"
-                  />
+                <div v-if="evidenceItems.length" class="evidence-list">
+                  <a
+                    v-for="item in evidenceItems"
+                    :key="item.url"
+                    :href="item.url"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="evidence-link"
+                  >
+                    <el-image v-if="item.isImage" :src="item.url" fit="cover" class="evidence" />
+                    <div v-else class="file-item">
+                      <el-icon><Document /></el-icon>
+                      <span class="file-name">{{ item.filename }}</span>
+                    </div>
+                  </a>
                 </div>
-                <div v-else class="sub-text">暂无图片佐证</div>
+                <div v-else class="sub-text">暂无佐证材料</div>
               </div>
               <div v-if="submission.pointsAwarded || submission.reviewComment" class="section">
                 <strong>审核备注：</strong>
@@ -205,12 +225,37 @@ onMounted(loadDetail)
   margin-top: 6px;
 }
 
+.evidence-link {
+  display: inline-flex;
+  text-decoration: none;
+  color: inherit;
+}
+
 .evidence {
   width: 160px;
   height: 100px;
   object-fit: cover;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
+}
+
+.file-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: #f8f8f8;
+  min-width: 160px;
+  box-sizing: border-box;
+}
+
+.file-name {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sub-text {
