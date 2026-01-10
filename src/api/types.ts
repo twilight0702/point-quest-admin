@@ -87,6 +87,7 @@ export interface Reward {
   pointCost: number
   status: 'ON' | 'OFF'
   stock?: number
+  imageUrls?: string[]
   categoryIds?: number[]
   categoryNames?: string[]
   createdAt?: string

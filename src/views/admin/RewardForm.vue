@@ -1,14 +1,16 @@
 ﻿<script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance, FormRules, UploadRequestOptions } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 import {
   addRewardCategory,
   createReward,
   deleteRewardCategory,
   fetchRewardCategories,
   fetchRewardDetail,
+  uploadRewardImage,
   updateReward,
   updateRewardCategory,
 } from '../../api/modules/adminRewards'
@@ -37,6 +39,8 @@ const categoryDialog = reactive({
   name: '',
 })
 const categorySaving = ref(false)
+const rewardImages = ref<string[]>([])
+const uploadingImage = ref(false)
 
 const isEdit = computed(() => !!props.rewardNo || props.mode === 'edit')
 
@@ -67,6 +71,7 @@ async function loadDetail() {
     form.stock = data.stock ?? 0
     form.status = (data.status as 'ON' | 'OFF') || 'ON'
     form.categoryIds = data.categoryIds || []
+    rewardImages.value = data.imageUrls || []
   } finally {
     loading.value = false
   }
@@ -149,6 +154,26 @@ async function handleDeleteCategory(category: RewardCategory) {
   }
 }
 
+async function handleUploadRequest(options: UploadRequestOptions) {
+  const { file, onError, onSuccess } = options
+  if (!props.rewardNo) {
+    ElMessage.warning('请先创建奖品后再上传图片')
+    onError?.(new Error('Reward not created'))
+    return
+  }
+  uploadingImage.value = true
+  try {
+    const url = await uploadRewardImage(props.rewardNo, file as File)
+    rewardImages.value = [...rewardImages.value, url]
+    onSuccess?.(url)
+    ElMessage.success('已上传图片')
+  } catch (error) {
+    onError?.(error as Error)
+  } finally {
+    uploadingImage.value = false
+  }
+}
+
 onMounted(async () => {
   await loadCategories()
   if (isEdit.value) {
@@ -211,6 +236,39 @@ onMounted(async () => {
             <el-button size="small" @click="openCategoryDialog()">管理分类</el-button>
           </div>
         </el-form-item>
+        <el-form-item label="商品图片">
+          <div class="image-section">
+            <div v-if="isEdit" class="uploader-row">
+              <el-upload
+                class="image-uploader"
+                action=""
+                :http-request="handleUploadRequest"
+                :show-file-list="false"
+                accept="image/*"
+                :disabled="uploadingImage"
+              >
+                <div class="upload-card">
+                  <el-icon class="upload-icon"><Plus /></el-icon>
+                  <div>上传图片</div>
+                </div>
+              </el-upload>
+              <div class="upload-hint">上传后自动保存，点击下方缩略图可查看大图</div>
+            </div>
+            <div v-else class="upload-hint">创建并保存后可上传商品图片</div>
+            <div v-if="rewardImages.length" class="image-list">
+              <el-image
+                v-for="(url, idx) in rewardImages"
+                :key="url + idx"
+                :src="url"
+                fit="cover"
+                class="reward-image"
+                :preview-src-list="rewardImages"
+                :initial-index="idx"
+              />
+            </div>
+            <div v-else class="sub-text">暂无商品图片</div>
+          </div>
+        </el-form-item>
         <el-form-item label="描述">
           <el-input
             v-model="form.description"
@@ -271,5 +329,64 @@ onMounted(async () => {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.image-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.uploader-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.image-uploader {
+  width: 140px;
+}
+
+.upload-card {
+  width: 140px;
+  height: 140px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--el-text-color-secondary);
+  background: #fafafa;
+}
+
+.upload-icon {
+  font-size: 20px;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+
+.image-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.reward-image {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.sub-text {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 </style>

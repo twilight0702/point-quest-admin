@@ -183,6 +183,22 @@ onMounted(async () => {
       <el-table :data="rewards" border :loading="loading">
         <el-table-column prop="rewardNo" label="奖品编号" width="140" />
         <el-table-column prop="name" label="名称" min-width="160" />
+        <el-table-column label="商品图" width="160">
+          <template #default="scope">
+            <div v-if="scope.row.imageUrls?.length" class="thumb-wrapper">
+              <el-image
+                :src="scope.row.imageUrls[0]"
+                fit="cover"
+                class="thumb"
+                :preview-src-list="scope.row.imageUrls"
+              />
+              <div v-if="(scope.row.imageUrls?.length ?? 0) > 1" class="thumb-count">
+                +{{ (scope.row.imageUrls?.length ?? 0) - 1 }}
+              </div>
+            </div>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="pointCost" label="积分消耗" width="100" />
         <el-table-column prop="stock" label="库存" width="90" />
         <el-table-column label="状态" width="100">
@@ -266,6 +282,32 @@ onMounted(async () => {
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+.thumb-wrapper {
+  position: relative;
+  width: 120px;
+  height: 80px;
+}
+
+.thumb {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.thumb-count {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 12px;
 }
 
 .dialog-actions {

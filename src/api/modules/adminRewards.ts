@@ -84,3 +84,14 @@ export function deleteRewardCategory(categoryId: number) {
     method: 'DELETE',
   })
 }
+
+export function uploadRewardImage(rewardNo: string, file: File) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return request<string>({
+    url: `/api/admin/rewards/${rewardNo}/image`,
+    method: 'POST',
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
