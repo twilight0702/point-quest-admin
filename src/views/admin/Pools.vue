@@ -81,7 +81,7 @@ onMounted(loadPools)
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>Pools</h1>
+      <h1>奖池</h1>
       <el-button type="primary" @click="goNew">新建奖池</el-button>
     </div>
 

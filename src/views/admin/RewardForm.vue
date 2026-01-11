@@ -43,6 +43,10 @@ const rewardImages = ref<string[]>([])
 const uploadingImage = ref(false)
 
 const isEdit = computed(() => !!props.rewardNo || props.mode === 'edit')
+const statusOptions = [
+  { label: '上架', value: 'ON' },
+  { label: '下架', value: 'OFF' },
+]
 
 const rules: FormRules = {
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
@@ -158,7 +162,7 @@ async function handleUploadRequest(options: UploadRequestOptions) {
   const { file, onError, onSuccess } = options
   if (!props.rewardNo) {
     ElMessage.warning('请先创建奖品后再上传图片')
-    onError?.(new Error('Reward not created'))
+    onError?.(new Error('奖品尚未创建'))
     return
   }
   uploadingImage.value = true
@@ -216,19 +220,22 @@ onMounted(async () => {
           </el-col>
           <el-col :span="12">
             <el-form-item label="状态">
-              <el-segmented v-model="form.status" :options="['ON', 'OFF']" />
+              <el-segmented v-model="form.status" :options="statusOptions" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="分类">
+        <el-form-item label="商品类型">
           <div class="category-select-row">
             <el-select
               v-model="form.categoryIds"
               multiple
+              collapse-tags
+              :max-collapse-tags="3"
+              collapse-tags-tooltip
               filterable
               clearable
-              placeholder="选择分类"
-              style="width: 100%"
+              placeholder="选择商品类型"
+              class="category-select"
               :loading="categoriesLoading"
             >
               <el-option v-for="cat in categories" :key="cat.id" :label="cat.name" :value="cat.id" />
@@ -301,7 +308,7 @@ onMounted(async () => {
       </el-form>
 
       <el-table :data="categories" :loading="categoriesLoading" size="small" border style="margin-top: 12px">
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="id" label="编号" width="80" />
         <el-table-column prop="name" label="分类名称" />
         <el-table-column label="操作" width="180" align="center">
           <template #default="scope">
@@ -323,6 +330,11 @@ onMounted(async () => {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.category-select {
+  flex: 1;
+  min-width: 0;
 }
 
 .dialog-actions {

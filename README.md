@@ -1,48 +1,67 @@
 # point-quest-admin
 
-This template should help get you started developing with Vue 3 in Vite.
+Point Quest 管理后台，负责任务、投稿、奖励、奖池、订单等管理配置与审核流程。
 
-## Recommended IDE Setup
+## 功能概览
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- 管理员登录与会话保持（JWT + 本地缓存）
+- 任务管理：新增、编辑、列表展示
+- 投稿管理：列表、详情查看
+- 奖励管理：新增、编辑、列表展示
+- 奖池管理：新增、编辑、列表展示
+- 订单管理：列表、详情查看
 
-## Recommended Browser Setup
+## 技术栈
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+- Vue 3 + Vite + TypeScript
+- Pinia、Vue Router
+- Element Plus、Axios
+- ESLint + Prettier
 
-## Type Support for `.vue` Imports in TS
+## 目录结构
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+```
+src/
+  api/        # 接口封装与模块
+  layouts/    # 布局
+  router/     # 路由与鉴权
+  stores/     # 状态管理
+  styles/     # 全局样式
+  utils/      # 工具方法
+  views/      # 页面
+```
 
-## Customize configuration
+## 环境要求
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- Node.js: ^20.19.0 或 >=22.12.0
+- pnpm
 
-## Project Setup
+## 快速开始
 
 ```sh
 pnpm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 pnpm dev
 ```
 
-### Type-Check, Compile and Minify for Production
+## 常用脚本
 
 ```sh
-pnpm build
+pnpm build       # 打包
+pnpm preview     # 本地预览
+pnpm type-check  # 类型检查
+pnpm lint        # 代码检查
+pnpm format      # 格式化
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## 环境变量
 
-```sh
-pnpm lint
+在根目录创建 `.env` 或 `.env.local`：
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
 ```
+
+## 鉴权说明
+
+- 登录成功后，JWT 会写入本地存储，路由守卫会在进入 `/admin` 相关页面前校验登录状态。
+- 后端需返回管理员角色信息（`role: "ADMIN"`）以通过权限校验。

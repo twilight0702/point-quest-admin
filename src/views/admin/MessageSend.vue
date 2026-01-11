@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
@@ -27,7 +27,7 @@ const onSubmit = () => {
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>Messages</h1>
+      <h1>消息</h1>
     </div>
     <el-card shadow="never">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" label-position="left">
@@ -43,15 +43,15 @@ const onSubmit = () => {
             <el-radio-button :label="false">指定用户</el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-if="!form.broadcast" label="用户 ID">
+        <el-form-item v-if="!form.broadcast" label="用户编号">
           <el-select
             v-model="form.receivers"
             multiple
             filterable
-            placeholder="输入或选择用户 ID"
+            placeholder="输入或选择用户编号"
             allow-create
           />
-          <p class="muted">支持输入多个用户 ID，按 Enter 确认</p>
+          <p class="muted">支持输入多个用户编号，按回车确认</p>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">发送</el-button>

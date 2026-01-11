@@ -70,7 +70,7 @@ onMounted(loadTasks)
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>Tasks</h1>
+      <h1>任务</h1>
       <el-button type="primary" @click="goNew">新建任务</el-button>
     </div>
 

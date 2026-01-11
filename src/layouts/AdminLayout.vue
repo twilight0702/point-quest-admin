@@ -18,13 +18,12 @@ const router = useRouter()
 const authStore = useAdminAuthStore()
 
 const navItems = [
-  { label: 'Dashboard', path: '/admin', icon: House },
-  { label: 'Tasks', path: '/admin/tasks', icon: List },
-  { label: 'Submissions', path: '/admin/submissions', icon: EditPen },
-  { label: 'Rewards', path: '/admin/rewards', icon: Coin },
-  { label: 'Pools', path: '/admin/pools', icon: CollectionTag },
-  { label: 'Messages', path: '/admin/messages/send', icon: Message },
-  { label: 'Orders', path: '/admin/orders', icon: Tickets },
+  { label: '概览', path: '/admin', icon: House },
+  { label: '任务', path: '/admin/tasks', icon: List },
+  { label: '提交', path: '/admin/submissions', icon: EditPen },
+  { label: '奖品', path: '/admin/rewards', icon: Coin },
+  { label: '奖池', path: '/admin/pools', icon: CollectionTag },
+  { label: '订单', path: '/admin/orders', icon: Tickets },
 ]
 
 const activeMenu = computed(() => {
@@ -56,8 +55,8 @@ async function handleLogout() {
       <div class="brand">
         <span class="dot"></span>
         <div>
-          <div class="brand-title">PointQuest</div>
-          <div class="brand-subtitle">Rewards Admin</div>
+          <div class="brand-title">积分奇旅</div>
+          <div class="brand-subtitle">积分管理后台</div>
         </div>
       </div>
       <el-menu
@@ -82,7 +81,7 @@ async function handleLogout() {
           <p class="muted">统一管理任务、奖品、活动池和订单</p>
         </div>
         <div class="header-actions">
-          <span class="user-chip">{{ authStore.me?.username ?? 'Admin' }}</span>
+          <span class="user-chip">{{ authStore.me?.username ?? '管理员' }}</span>
           <el-button size="small" type="primary" plain @click="handleLogout">退出登录</el-button>
         </div>
       </el-header>

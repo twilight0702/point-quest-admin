@@ -19,6 +19,11 @@ const form = reactive({
 })
 
 const isEdit = computed(() => !!props.taskNo || props.mode === 'edit')
+const statusOptions = [
+  { label: '进行中', value: 'OPEN' },
+  { label: '已关闭', value: 'CLOSED' },
+  { label: '已结束', value: 'ENDED' },
+]
 
 const rules: FormRules = {
   title: [{ required: true, message: '请输入任务标题', trigger: 'blur' }],
@@ -98,7 +103,7 @@ function onSubmit() {
           />
         </el-form-item>
         <el-form-item label="状态">
-          <el-segmented v-model="form.status" :options="['OPEN', 'CLOSED', 'ENDED']" />
+          <el-segmented v-model="form.status" :options="statusOptions" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">{{

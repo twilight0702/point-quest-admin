@@ -36,6 +36,10 @@ const rewards = ref<Reward[]>([])
 const rewardsLoading = ref(false)
 
 const isEdit = computed(() => !!props.poolNo || props.mode === 'edit')
+const statusOptions = [
+  { label: '开启', value: 'ON' },
+  { label: '关闭', value: 'OFF' },
+]
 
 const rules: FormRules = {
   title: [{ required: true, message: '请输入奖池标题', trigger: 'blur' }],
@@ -193,7 +197,7 @@ onMounted(async () => {
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item label="状态">
-              <el-segmented v-model="form.status" :options="['ON', 'OFF']" />
+              <el-segmented v-model="form.status" :options="statusOptions" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -221,7 +225,7 @@ onMounted(async () => {
         <el-form-item label="奖品列表">
           <div class="items-block">
             <el-table :data="form.items" border size="small" style="width: 100%">
-              <el-table-column type="index" label="#" width="50" />
+              <el-table-column type="index" label="序号" width="70" />
               <el-table-column label="奖品" min-width="200">
                 <template #default="scope">
                   <el-select

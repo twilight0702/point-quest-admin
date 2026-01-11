@@ -12,17 +12,12 @@ const reminders = [
   { title: '有 5 条未读站内消息', time: '刚刚' },
 ]
 
-const recentMessages = [
-  { title: '签到活动补发说明', status: '未读', time: '08:20' },
-  { title: '补充库存完成', status: '已读', time: '昨天' },
-  { title: '新任务上线', status: '已读', time: '本周' },
-]
 </script>
 
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>Dashboard</h1>
+      <h1>概览</h1>
       <el-button type="primary" size="small" plain>刷新数据</el-button>
     </div>
 
@@ -50,20 +45,6 @@ const recentMessages = [
             </div>
           </div>
         </div>
-      </el-card>
-
-      <el-card shadow="hover">
-        <template #header>
-          <div class="card-header">
-            <span>近期站内信</span>
-            <el-link type="primary" :underline="false">进入消息中心</el-link>
-          </div>
-        </template>
-        <el-table :data="recentMessages" border size="small">
-          <el-table-column prop="title" label="标题" />
-          <el-table-column prop="status" label="状态" width="90" />
-          <el-table-column prop="time" label="时间" width="120" />
-        </el-table>
       </el-card>
     </div>
   </div>

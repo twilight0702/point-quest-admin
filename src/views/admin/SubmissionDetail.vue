@@ -88,7 +88,7 @@ onMounted(loadDetail)
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>Submission #{{ submission?.submissionNo ?? props.submissionNo }}</h1>
+      <h1>提交编号：{{ submission?.submissionNo ?? props.submissionNo }}</h1>
       <el-button plain @click="$router.back()">返回</el-button>
     </div>
 

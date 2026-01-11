@@ -74,7 +74,7 @@ onMounted(loadSubmissions)
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>Submissions</h1>
+      <h1>提交</h1>
       <el-button type="primary" plain size="small" @click="loadSubmissions">刷新</el-button>
     </div>
 

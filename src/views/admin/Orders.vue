@@ -39,7 +39,7 @@ async function loadOrders() {
   loading.value = true
   const userIdParam = filters.userId.trim() ? Number(filters.userId) : undefined
   if (userIdParam !== undefined && Number.isNaN(userIdParam)) {
-    ElMessage.warning('请输入有效的用户ID')
+    ElMessage.warning('请输入有效的用户编号')
     loading.value = false
     return
   }
@@ -87,7 +87,7 @@ onMounted(loadOrders)
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>Orders</h1>
+      <h1>订单</h1>
       <el-button type="primary" plain size="small" @click="loadOrders">刷新</el-button>
     </div>
 
@@ -98,7 +98,7 @@ onMounted(loadOrders)
         </el-select>
         <el-input
           v-model="filters.userId"
-          placeholder="用户ID"
+          placeholder="用户编号"
           clearable
           size="small"
           style="width: 180px"
@@ -109,7 +109,7 @@ onMounted(loadOrders)
 
       <el-table :data="orders" border :loading="loading">
         <el-table-column prop="orderNo" label="订单号" min-width="200" />
-        <el-table-column prop="userId" label="用户ID" width="120" />
+        <el-table-column prop="userId" label="用户编号" width="120" />
         <el-table-column prop="itemCount" label="商品数" width="100" />
         <el-table-column prop="totalPoints" label="积分消耗" width="110" />
         <el-table-column prop="createdAt" label="创建时间" min-width="170" />

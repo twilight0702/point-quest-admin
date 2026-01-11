@@ -158,7 +158,7 @@ onMounted(async () => {
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>Rewards</h1>
+      <h1>奖品</h1>
       <el-button type="primary" @click="goNew">新建奖品</el-button>
     </div>
 
@@ -253,7 +253,7 @@ onMounted(async () => {
       </el-form>
 
       <el-table :data="categories" :loading="categoriesLoading" size="small" border style="margin-top: 12px">
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="id" label="编号" width="80" />
         <el-table-column prop="name" label="分类名称" />
         <el-table-column label="操作" width="180" align="center">
           <template #default="scope">

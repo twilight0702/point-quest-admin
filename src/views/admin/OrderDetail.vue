@@ -60,7 +60,7 @@ onMounted(loadDetail)
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>Order #{{ props.orderNo }}</h1>
+      <h1>订单编号：{{ props.orderNo }}</h1>
       <el-button plain @click="$router.back()">返回</el-button>
     </div>
 
@@ -75,7 +75,7 @@ onMounted(loadDetail)
                 <span>{{ order.orderNo }}</span>
               </div>
               <div class="info-row">
-                <span class="label">用户ID</span>
+                <span class="label">用户编号</span>
                 <span>{{ order.userId }}</span>
               </div>
               <div class="info-row">
@@ -103,7 +103,7 @@ onMounted(loadDetail)
         <el-card shadow="never" style="margin-top: 14px" :loading="loading">
           <template #header>订单项</template>
           <el-table v-if="order" :data="order.items" border size="small">
-            <el-table-column prop="rewardId" label="奖品ID" width="120" />
+            <el-table-column prop="rewardId" label="奖品编号" width="120" />
             <el-table-column prop="rewardName" label="奖品名称" min-width="160" />
             <el-table-column prop="pointCost" label="积分消耗" width="120" />
             <el-table-column prop="quantity" label="数量" width="90" />

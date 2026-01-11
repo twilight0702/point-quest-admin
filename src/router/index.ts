@@ -11,7 +11,6 @@ import Rewards from '../views/admin/Rewards.vue'
 import RewardForm from '../views/admin/RewardForm.vue'
 import Pools from '../views/admin/Pools.vue'
 import PoolForm from '../views/admin/PoolForm.vue'
-import MessageSend from '../views/admin/MessageSend.vue'
 import Orders from '../views/admin/Orders.vue'
 import OrderDetail from '../views/admin/OrderDetail.vue'
 
@@ -56,7 +55,6 @@ const router = createRouter({
         { path: 'pools', name: 'AdminPools', component: Pools },
         { path: 'pools/new', name: 'AdminPoolNew', component: PoolForm, props: { mode: 'create' } },
         { path: 'pools/:poolNo/edit', name: 'AdminPoolEdit', component: PoolForm, props: true },
-        { path: 'messages/send', name: 'AdminMessageSend', component: MessageSend },
         { path: 'orders', name: 'AdminOrders', component: Orders },
         { path: 'orders/:orderNo', name: 'AdminOrderDetail', component: OrderDetail, props: true },
       ],

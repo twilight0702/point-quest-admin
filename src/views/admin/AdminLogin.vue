@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -35,7 +35,7 @@ const onSubmit = () => {
       <div class="logo">
         <span class="dot"></span>
         <div>
-          <div class="title">PointQuest</div>
+          <div class="title">积分奇旅</div>
           <div class="subtitle">管理员登录</div>
         </div>
       </div>
@@ -63,7 +63,7 @@ const onSubmit = () => {
           </el-button>
         </el-form-item>
       </el-form>
-      <p class="muted">登录后将跳转到 Dashboard，未登录访问管理页会自动重定向</p>
+      <p class="muted">登录后将进入概览页，未登录访问管理页会自动重定向</p>
     </div>
   </div>
 </template>
